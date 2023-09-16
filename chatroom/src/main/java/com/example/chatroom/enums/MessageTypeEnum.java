@@ -1,2 +1,5 @@
-package com.example.chatroom.enums;public enum MessageTypeEnum {
+package com.example.chatroom.enums;
+
+public enum MessageTypeEnum {
+    PLAINTEXT, FILE, SYSTEM;
 }
