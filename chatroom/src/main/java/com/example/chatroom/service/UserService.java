@@ -11,4 +11,6 @@ public interface UserService {
     boolean setUserName(String userId, String newUserName);
 
     boolean joinChatroom(String userId, String chatroomId);
+
+    boolean leaveChatroom(String userId, String chatroomId);
 }

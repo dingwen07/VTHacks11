@@ -14,5 +14,4 @@ public interface ChatroomService {
     boolean addChatroom(String id);
     boolean setChatroomName(String id, String newName);
     boolean deleteChatroom(String id);
-
 }

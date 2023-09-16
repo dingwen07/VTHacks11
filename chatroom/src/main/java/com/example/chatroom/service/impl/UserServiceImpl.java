@@ -57,4 +57,17 @@ public class UserServiceImpl implements UserService {
         }
         return false;
     }
+
+    public boolean leaveChatroom(String userId, String chatroomId) {
+        RBucket<UserDTO> bucket = redissonClient.getBucket("user:" + userId);
+        UserDTO userDTO = bucket.get();
+        if (userDTO != null) {
+            if (userDTO.getChatroom().contains(chatroomId)) {
+                userDTO.getChatroom().remove(chatroomId);
+                bucket.set(userDTO);
+                return true;
+            }
+        }
+        return false;
+    }
 }
