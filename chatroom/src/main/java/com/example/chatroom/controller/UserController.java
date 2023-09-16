@@ -96,6 +96,7 @@ public class UserController {
             ChatroomDTO chatroomDTO = chatroomService.getChatroom(chatroomId);
             if (chatroomDTO != null) {
                 ChatroomResp chatroomResp = new ChatroomResp();
+                chatroomResp.setId(chatroomId);
                 chatroomResp.setLastMessageId(chatroomService.getLastMessageId(chatroomId));
                 chatroomResp.setJoined(true);
                 chatroomResp.setName(chatroomDTO.getName());

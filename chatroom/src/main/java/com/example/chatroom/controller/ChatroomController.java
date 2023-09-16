@@ -46,6 +46,7 @@ public class ChatroomController {
             return new ResponseEntity<>(responseDTO, HttpStatus.NOT_FOUND);
         }
         ChatroomResp chatroomResp = new ChatroomResp();
+        chatroomResp.setId(chatroomId);
         chatroomResp.setJoined(userDTO.getChatroom().contains(chatroomId));
         chatroomResp.setMemberCount(0);
         chatroomResp.setLastMessageId(chatroomService.getLastMessageId(chatroomId));

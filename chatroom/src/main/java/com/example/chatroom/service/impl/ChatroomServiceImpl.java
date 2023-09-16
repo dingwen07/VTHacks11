@@ -43,7 +43,7 @@ public class ChatroomServiceImpl implements ChatroomService {
         }
         if (fromIndex < 0) fromIndex = 0;
         if (toIndex > list.size()) toIndex = list.size();
-        
+
         return list.subList(fromIndex, toIndex);
     }
 
