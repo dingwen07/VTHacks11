@@ -36,13 +36,13 @@ public class ChatroomController {
         UserDTO userDTO = userService.getUser(userId);
         if (userDTO == null) {
             responseDTO.setStatus(400);
-            responseDTO.setMessage("Bad Request");
+            responseDTO.setMessage("User Does Not Exist");
             return ResponseEntity.badRequest().body(responseDTO);
         }
         ChatroomDTO chatroomDTO = chatroomService.getChatroom(chatroomId);
         if (chatroomDTO == null) {
             responseDTO.setStatus(404);
-            responseDTO.setMessage("Not Found");
+            responseDTO.setMessage("Chatroom Not Found");
             return new ResponseEntity<>(responseDTO, HttpStatus.NOT_FOUND);
         }
         ChatroomResp chatroomResp = new ChatroomResp();
@@ -64,17 +64,22 @@ public class ChatroomController {
         UserDTO userDTO = userService.getUser(userId);
         if (userDTO == null) {
             responseDTO.setStatus(400);
-            responseDTO.setMessage("Bad Request");
+            responseDTO.setMessage("User Does Not Exist");
             return ResponseEntity.badRequest().body(responseDTO);
         }
         MessageDTO messageDTO = new MessageDTO();
         messageDTO.setChatroom(chatroomId);
         messageDTO.setMessageType(MessageTypeEnum.SYSTEM);
         String userIdMd5 = DigestUtils.md5DigestAsHex(userDTO.getId().getBytes(StandardCharsets.UTF_8));
-        messageDTO.setSenderId(null);
+        messageDTO.setSenderId("");
         if (chatroomService.addChatroom(chatroomId)) {
             messageDTO.setPayload(String.format("User %s (%s) Created the Chatroom", userDTO.getName(), userIdMd5));
         } else {
+            if (!userService.joinChatroom(userId, chatroomId)) {
+                responseDTO.setStatus(400);
+                responseDTO.setMessage("User Already Joined Chatroom");
+                return ResponseEntity.badRequest().body(responseDTO);
+            }
             messageDTO.setPayload(String.format("User %s (%s) Joined the Chatroom", userDTO.getName(), userIdMd5));
         }
         chatroomService.addMessage(chatroomId, messageDTO);
@@ -143,7 +148,7 @@ public class ChatroomController {
     @PostMapping("/{chatroomId}/chat")
     public ResponseEntity<ResponseDTO<MessageSendResp>> sendMessage(@PathVariable String chatroomId,
                                                                     @RequestParam(value = "user_id") String userId,
-                                                                    @RequestParam(value = "message ") String payload) {
+                                                                    @RequestParam(value = "message") String payload) {
         ResponseDTO<MessageSendResp> responseDTO = new ResponseDTO();
         UserDTO userDTO = userService.getUser(userId);
         if (userDTO == null || !userDTO.getChatroom().contains(chatroomId)) {

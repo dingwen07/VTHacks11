@@ -1,20 +1,27 @@
 package com.example.chatroom.controller;
 import com.example.chatroom.dto.ResponseDTO;
+import com.example.chatroom.dto.chatroom.ChatroomDTO;
+import com.example.chatroom.dto.chatroom.ChatroomResp;
 import com.example.chatroom.dto.user.UserAddResp;
 import com.example.chatroom.dto.user.UserChatroomResp;
 import com.example.chatroom.dto.user.UserDTO;
 import com.example.chatroom.dto.user.UserInfoResp;
+import com.example.chatroom.service.ChatroomService;
 import com.example.chatroom.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+
 @RestController
 @RequestMapping("/user")
 public class UserController {
     @Autowired
     UserService userService;
+    @Autowired
+    ChatroomService chatroomService;
 
     @GetMapping("")
     public ResponseEntity<ResponseDTO<String>> getUser() {
@@ -67,6 +74,7 @@ public class UserController {
             dto.setData(userInfoResp);
             dto.setStatus(200);
             dto.setMessage("OK");
+            return ResponseEntity.ok(dto);
         }
         dto.setStatus(404);
         dto.setMessage("Not Found");
@@ -75,6 +83,31 @@ public class UserController {
 
     @GetMapping("/{userId}/chatroom")
     public ResponseEntity<ResponseDTO<UserChatroomResp>> getChatroom(@PathVariable String userId) {
-        return null;
+        ResponseDTO<UserChatroomResp> responseDTO = new ResponseDTO<>();
+        UserDTO userDTO = userService.getUser(userId);
+        if (userDTO == null) {
+            responseDTO.setStatus(404);
+            responseDTO.setMessage("Not Found");
+            return new ResponseEntity<>(responseDTO, HttpStatus.NOT_FOUND);
+        }
+        ArrayList<ChatroomResp> chatroomResps = new ArrayList<>();
+        for (String chatroomId: userDTO.getChatroom()
+             ) {
+            ChatroomDTO chatroomDTO = chatroomService.getChatroom(chatroomId);
+            if (chatroomDTO != null) {
+                ChatroomResp chatroomResp = new ChatroomResp();
+                chatroomResp.setLastMessageId(chatroomService.getLastMessageId(chatroomId));
+                chatroomResp.setJoined(true);
+                chatroomResp.setName(chatroomDTO.getName());
+                chatroomResp.setMemberCount(0);
+                chatroomResps.add(chatroomResp);
+            }
+        }
+        UserChatroomResp userChatroomResp = new UserChatroomResp();
+        userChatroomResp.setChatroom(chatroomResps);
+        responseDTO.setData(userChatroomResp);
+        responseDTO.setStatus(200);
+        responseDTO.setMessage("OK");
+        return ResponseEntity.ok(responseDTO);
     }
 }
