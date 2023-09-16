@@ -3,6 +3,7 @@ package com.example.chatroom.service.impl;
 import com.example.chatroom.dto.chatroom.ChatroomDTO;
 import com.example.chatroom.dto.message.MessageDTO;
 import com.example.chatroom.service.ChatroomService;
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBucket;
 import org.redisson.api.RList;
 import org.redisson.api.RKeys;
@@ -15,6 +16,7 @@ import java.util.List;
 
 
 @Service
+@Slf4j
 public class ChatroomServiceImpl implements ChatroomService {
     @Autowired
     RedissonClient redissonClient;
@@ -24,12 +26,25 @@ public class ChatroomServiceImpl implements ChatroomService {
         return bucket.get();
     }
 
-    public List<MessageDTO> getMessageById(String chatroomId, int startMessageId, int endMessageId) {
+    public List<MessageDTO> getMessageById(String chatroomId, int messageId, int offset) {
         RList<MessageDTO> list = redissonClient.getList("chatroom:" + chatroomId + ":message");
         if (list.isEmpty()) {
             return null;
         }
-        return list.subList(startMessageId, endMessageId);
+        if (offset == 0) return new ArrayList<>();
+
+        int fromIndex, toIndex;
+        if (offset >= 0) {
+            fromIndex = messageId;
+            toIndex = messageId + offset;
+        } else {
+            fromIndex = messageId + offset;
+            toIndex = messageId;
+        }
+        if (fromIndex < 0) fromIndex = 0;
+        if (toIndex > list.size()) toIndex = list.size();
+        
+        return list.subList(fromIndex, toIndex);
     }
 
     public int getLastMessageId(String id) {

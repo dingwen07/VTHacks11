@@ -59,7 +59,9 @@ public class ChatroomController {
 
     @PostMapping("/{chatroomId}")
     public ResponseEntity<ResponseDTO<String>> postChatroom(@PathVariable String chatroomId,
-                                                            @RequestParam(value = "user_id") String userId) {
+                                                            @RequestParam(value = "user_id") String userId,
+                                                            @RequestParam(value = "room_name", required = false)
+                                                                String roomName) {
         ResponseDTO<String> responseDTO = new ResponseDTO();
         UserDTO userDTO = userService.getUser(userId);
         if (userDTO == null) {
@@ -73,6 +75,10 @@ public class ChatroomController {
         String userIdMd5 = DigestUtils.md5DigestAsHex(userDTO.getId().getBytes(StandardCharsets.UTF_8));
         messageDTO.setSenderId("");
         if (chatroomService.addChatroom(chatroomId)) {
+            userService.joinChatroom(userId, chatroomId);
+            if (roomName != null) {
+                chatroomService.setChatroomName(chatroomId, roomName);
+            }
             messageDTO.setPayload(String.format("User %s (%s) Created the Chatroom", userDTO.getName(), userIdMd5));
         } else {
             if (!userService.joinChatroom(userId, chatroomId)) {
@@ -83,7 +89,8 @@ public class ChatroomController {
             messageDTO.setPayload(String.format("User %s (%s) Joined the Chatroom", userDTO.getName(), userIdMd5));
         }
         chatroomService.addMessage(chatroomId, messageDTO);
-
+        responseDTO.setStatus(200);
+        responseDTO.setMessage("OK");
         return ResponseEntity.ok(responseDTO);
     }
 
@@ -109,16 +116,7 @@ public class ChatroomController {
                                                                  @RequestParam(value = "offset") int offset,
                                                                  @RequestParam(value = "message_id") int messageId) {
         ResponseDTO<MessagesResp> responseDTO = new ResponseDTO();
-        int startIndex = 0;
-        int endIndex = 0;
-        if (offset >= 0) {
-            startIndex = messageId;
-            endIndex = messageId + offset;
-        } else {
-            startIndex = messageId + offset;
-            endIndex = messageId;
-        }
-        List<MessageDTO> messages = chatroomService.getMessageById(chatroomId, startIndex, endIndex);
+        List<MessageDTO> messages = chatroomService.getMessageById(chatroomId, messageId, offset);
         if (messages ==  null) {
             responseDTO.setStatus(404);
             responseDTO.setMessage("Not Found");
