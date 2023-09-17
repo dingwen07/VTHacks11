@@ -67,6 +67,7 @@ public class ChatroomServiceImpl implements ChatroomService {
         ChatroomDTO dto = new ChatroomDTO();
         dto.setId(id);
         dto.setName("");
+        dto.setNumUsers(0);
         bucket.set(dto);
         return true;
     }
@@ -78,6 +79,17 @@ public class ChatroomServiceImpl implements ChatroomService {
             return false;
         }
         chatroomDTO.setName(newName);
+        bucket.set(chatroomDTO);
+        return true;
+    }
+
+    public boolean incrChatroomNumUser(String id, int num) {
+        RBucket<ChatroomDTO> bucket = redissonClient.getBucket("chatroom:" + id + ":info");
+        ChatroomDTO chatroomDTO = bucket.get();
+        if (chatroomDTO == null) {
+            return false;
+        }
+        chatroomDTO.setNumUsers(chatroomDTO.getNumUsers() + num);
         bucket.set(chatroomDTO);
         return true;
     }

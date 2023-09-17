@@ -8,4 +8,5 @@ import java.io.Serializable;
 public class ChatroomDTO implements Serializable {
     private String id;
     private String name;
+    private Integer numUsers;
 }

@@ -98,7 +98,7 @@ public class UserController {
                 chatroomResp.setLastMessageId(chatroomService.getLastMessageId(chatroomId));
                 chatroomResp.setJoined(true);
                 chatroomResp.setName(chatroomDTO.getName());
-                chatroomResp.setMemberCount(0);
+                chatroomResp.setMemberCount(chatroomDTO.getNumUsers());
                 chatroomResps.add(chatroomResp);
             }
         }

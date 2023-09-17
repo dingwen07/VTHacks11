@@ -13,5 +13,6 @@ public interface ChatroomService {
     int getLastMessageId(String id);
     boolean addChatroom(String id);
     boolean setChatroomName(String id, String newName);
+    boolean incrChatroomNumUser(String id, int num);
     boolean deleteChatroom(String id);
 }

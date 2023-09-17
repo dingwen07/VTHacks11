@@ -1,6 +1,7 @@
 package com.example.chatroom.service.impl;
 
 import com.example.chatroom.dto.user.UserDTO;
+import com.example.chatroom.service.ChatroomService;
 import com.example.chatroom.service.UserService;
 import org.redisson.api.RBucket;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     RedissonClient redissonClient;
+
+    @Autowired
+    ChatroomService chatroomService;
 
     public UserDTO addUser(String name) {
         String userId = UUID.randomUUID().toString();
@@ -51,6 +55,7 @@ public class UserServiceImpl implements UserService {
         if (userDTO != null) {
             if (!userDTO.getChatroom().contains(chatroomId)) {
                 userDTO.getChatroom().add(chatroomId);
+                chatroomService.incrChatroomNumUser(chatroomId, 1);
                 bucket.set(userDTO);
                 return true;
             }
@@ -64,6 +69,7 @@ public class UserServiceImpl implements UserService {
         if (userDTO != null) {
             if (userDTO.getChatroom().contains(chatroomId)) {
                 userDTO.getChatroom().remove(chatroomId);
+                chatroomService.incrChatroomNumUser(chatroomId, -1);
                 bucket.set(userDTO);
                 return true;
             }

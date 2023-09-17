@@ -46,7 +46,7 @@ public class ChatroomController {
         ChatroomResp chatroomResp = new ChatroomResp();
         chatroomResp.setId(chatroomId);
         chatroomResp.setJoined(userDTO.getChatroom().contains(chatroomId));
-        chatroomResp.setMemberCount(0);
+        chatroomResp.setMemberCount(chatroomDTO.getNumUsers());
         chatroomResp.setLastMessageId(chatroomService.getLastMessageId(chatroomId));
         chatroomResp.setName(chatroomDTO.getName());
 
@@ -69,8 +69,9 @@ public class ChatroomController {
         MessageDTO messageDTO = new MessageDTO();
         messageDTO.setChatroom(chatroomId);
         messageDTO.setMessageType(MessageTypeEnum.SYSTEM);
+        messageDTO.setSenderName("SYSTEM");
         String userIdMd5 = DigestUtils.md5DigestAsHex(userDTO.getId().getBytes(StandardCharsets.UTF_8));
-        messageDTO.setSenderId("");
+        messageDTO.setSenderId("SYSTEM");
         if (chatroomService.addChatroom(chatroomId)) {
             userService.joinChatroom(req.getUserId(), chatroomId);
             if (req.getRoomName() != null) {
@@ -147,13 +148,22 @@ public class ChatroomController {
         UserDTO userDTO = userService.getUser(req.getUserId());
         if (userDTO == null || !userDTO.getChatroom().contains(chatroomId)) {
             responseDTO.setStatus(400);
-            responseDTO.setMessage("Bad Request");
+            responseDTO.setMessage("User or Chatroom Invalid");
+            return ResponseEntity.badRequest().body(responseDTO);
+        }
+        if (req.getMessage() == null) {
+            responseDTO.setStatus(400);
+            responseDTO.setMessage("Message Invalid");
             return ResponseEntity.badRequest().body(responseDTO);
         }
         MessageDTO messageDTO = new MessageDTO();
         messageDTO.setSenderName(userDTO.getName());
         messageDTO.setChatroom(chatroomId);
-        messageDTO.setMessageType(MessageTypeEnum.PLAINTEXT);
+        MessageTypeEnum messageType = req.getMessageType();
+        if (messageType == null || messageType == MessageTypeEnum.SYSTEM) {
+            messageType = MessageTypeEnum.PLAINTEXT;
+        }
+        messageDTO.setMessageType(messageType);
         messageDTO.setPayload(req.getMessage());
         messageDTO.setSenderId(req.getUserId());
         messageDTO.setTimestamp(System.currentTimeMillis());
