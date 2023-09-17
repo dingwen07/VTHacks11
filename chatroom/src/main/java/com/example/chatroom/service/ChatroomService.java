@@ -3,7 +3,6 @@ package com.example.chatroom.service;
 import com.example.chatroom.dto.chatroom.ChatroomDTO;
 import com.example.chatroom.dto.message.MessageDTO;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public interface ChatroomService {
@@ -14,5 +13,6 @@ public interface ChatroomService {
     boolean addChatroom(String id);
     boolean setChatroomName(String id, String newName);
     boolean incrChatroomNumUser(String id, int num);
+    boolean refreshChatroom(String id);
     boolean deleteChatroom(String id);
 }

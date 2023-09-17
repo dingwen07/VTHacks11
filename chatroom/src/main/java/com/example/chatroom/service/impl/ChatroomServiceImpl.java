@@ -31,6 +31,17 @@ public class ChatroomServiceImpl implements ChatroomService {
         if (list.isEmpty()) {
             return null;
         }
+        RBucket<ChatroomDTO> bucket = redissonClient.getBucket("chatroom:" + chatroomId + ":info");
+        ChatroomDTO chatroomDTO = bucket.get();
+        if (System.currentTimeMillis() - chatroomDTO.getLastActive() > 60 * 60 * 24 * 7 * 1000) {
+            deleteChatroom(chatroomId);
+            addChatroom(chatroomId);
+            return new ArrayList<>();
+        } else {
+            chatroomDTO.setLastActive(System.currentTimeMillis());
+            bucket.set(chatroomDTO);
+        }
+
         if (offset == 0) return new ArrayList<>();
 
         int fromIndex, toIndex;
@@ -68,6 +79,7 @@ public class ChatroomServiceImpl implements ChatroomService {
         dto.setId(id);
         dto.setName("");
         dto.setNumUsers(0);
+        dto.setLastActive(System.currentTimeMillis());
         bucket.set(dto);
         return true;
     }
@@ -90,6 +102,17 @@ public class ChatroomServiceImpl implements ChatroomService {
             return false;
         }
         chatroomDTO.setNumUsers(chatroomDTO.getNumUsers() + num);
+        bucket.set(chatroomDTO);
+        return true;
+    }
+
+    public boolean refreshChatroom(String id) {
+        RBucket<ChatroomDTO> bucket = redissonClient.getBucket("chatroom:" + id + ":info");
+        ChatroomDTO chatroomDTO = bucket.get();
+        if (chatroomDTO == null) {
+            return false;
+        }
+        chatroomDTO.setLastActive(System.currentTimeMillis());
         bucket.set(chatroomDTO);
         return true;
     }
