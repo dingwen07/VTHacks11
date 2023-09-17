@@ -4,7 +4,7 @@
 ![GitHub repo size](https://img.shields.io/github/repo-size/dingwen07/VTHacks11?color=orange)
 ![GitHub last commit](https://img.shields.io/github/last-commit/dingwen07/VTHacks11?color=green)
 ![GitHub Language](https://img.shields.io/github/languages/top/dingwen07/VTHacks11?color=red)
-![GitHub License](https://img.shields.io/github/license/dingwen07/VTHacks11?color=gray)
+![GitHub License](https://img.shields.io/github/license/dingwen07/VTHacks11)
 
 ## Description
 A temporary online groupchat platform. This repository contains the backend server. The frontend is located at [dingwen07/VTHacks11-Frontend](https://github.com/dingwen07/VTHacks11-Frontend).
