@@ -132,6 +132,7 @@ public class ChatroomController {
             messageResp.setId(messageDTO.getId());
             messageResp.setPayload(messageDTO.getPayload());
             messageResp.setSenderName(messageDTO.getSenderName());
+            messageResp.setTimestamp(messageDTO.getTimestamp());
             String userIdMd5 = DigestUtils.md5DigestAsHex(messageDTO.getSenderId().getBytes(StandardCharsets.UTF_8));
             messageResp.setSenderIdHash(userIdMd5);
             messageRespList.add(messageResp);
@@ -161,6 +162,7 @@ public class ChatroomController {
         messageDTO.setMessageType(MessageTypeEnum.PLAINTEXT);
         messageDTO.setPayload(payload);
         messageDTO.setSenderId(userId);
+        messageDTO.setTimestamp(System.currentTimeMillis());
         int messageId = chatroomService.addMessage(chatroomId, messageDTO);
         MessageSendResp messageSendResp = new MessageSendResp();
         messageSendResp.setMessageId(messageId);
