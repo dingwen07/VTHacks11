@@ -22,7 +22,7 @@ public class ChatroomServiceImpl implements ChatroomService {
     RedissonClient redissonClient;
 
     public ChatroomDTO getChatroom(String id) {
-        RBucket<ChatroomDTO> bucket = redissonClient.getBucket("chatroom:" + id);
+        RBucket<ChatroomDTO> bucket = redissonClient.getBucket("chatroom:" + id + ":info");
         return bucket.get();
     }
 
@@ -60,7 +60,7 @@ public class ChatroomServiceImpl implements ChatroomService {
     }
 
     public boolean addChatroom(String id) {
-        RBucket<ChatroomDTO> bucket = redissonClient.getBucket("chatroom:" + id);
+        RBucket<ChatroomDTO> bucket = redissonClient.getBucket("chatroom:" + id + ":info");
         if (bucket.get() != null) {
             return false;
         }
@@ -72,7 +72,7 @@ public class ChatroomServiceImpl implements ChatroomService {
     }
 
     public boolean setChatroomName(String id, String newName) {
-        RBucket<ChatroomDTO> bucket = redissonClient.getBucket("chatroom:" + id);
+        RBucket<ChatroomDTO> bucket = redissonClient.getBucket("chatroom:" + id + ":info");
         ChatroomDTO chatroomDTO = bucket.get();
         if (chatroomDTO == null) {
             return false;
@@ -86,7 +86,6 @@ public class ChatroomServiceImpl implements ChatroomService {
         RKeys keys = redissonClient.getKeys();
         if (keys.countExists("chatroom:" + id) > 0) {
             keys.delete("chatroom:" + id);
-            keys.delete("chatroom:" + id + ":message");
             return true;
         }
         return false;
