@@ -2,12 +2,10 @@ package com.example.chatroom.controller;
 import com.example.chatroom.dto.ResponseDTO;
 import com.example.chatroom.dto.chatroom.ChatroomDTO;
 import com.example.chatroom.dto.chatroom.ChatroomResp;
-import com.example.chatroom.dto.user.UserAddResp;
-import com.example.chatroom.dto.user.UserChatroomResp;
-import com.example.chatroom.dto.user.UserDTO;
-import com.example.chatroom.dto.user.UserInfoResp;
+import com.example.chatroom.dto.user.*;
 import com.example.chatroom.service.ChatroomService;
 import com.example.chatroom.service.UserService;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,9 +30,9 @@ public class UserController {
     }
 
     @PostMapping("")
-    public ResponseDTO<UserAddResp> addUser(@RequestParam(value = "name") String name) {
+    public ResponseDTO<UserAddResp> addUser(@RequestBody UserReq userReq) {
         ResponseDTO<UserAddResp> dto = new ResponseDTO<>();
-        UserDTO userDTO = userService.addUser(name);
+        UserDTO userDTO = userService.addUser(userReq.getName());
         UserAddResp userAddResp = new UserAddResp();
         if (userDTO != null) {
             userAddResp.setUserId(userDTO.getId());
@@ -65,12 +63,12 @@ public class UserController {
 
     @PutMapping("/{userId}")
     public ResponseEntity<ResponseDTO<UserInfoResp>> setUserName(@PathVariable String userId,
-                                                                 @RequestParam(value = "name") String newUserName) {
+                                                                 @RequestBody UserReq req) {
         ResponseDTO<UserInfoResp> dto = new ResponseDTO<>();
-        Boolean success = userService.setUserName(userId, newUserName);
+        Boolean success = userService.setUserName(userId, req.getName());
         if (success) {
             UserInfoResp userInfoResp = new UserInfoResp();
-            userInfoResp.setName(newUserName);
+            userInfoResp.setName(req.getName());
             dto.setData(userInfoResp);
             dto.setStatus(200);
             dto.setMessage("OK");
