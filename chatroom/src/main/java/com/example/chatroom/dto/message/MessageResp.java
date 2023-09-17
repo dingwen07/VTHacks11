@@ -13,4 +13,5 @@ public class MessageResp implements Serializable {
     private MessageTypeEnum messageType;
     private String senderName;
     private String senderIdHash;
+    private Long timestamp;
 }

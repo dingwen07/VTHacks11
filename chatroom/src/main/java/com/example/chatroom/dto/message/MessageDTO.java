@@ -13,4 +13,5 @@ public class MessageDTO implements Serializable {
     private MessageTypeEnum messageType;
     private String senderId;
     private String senderName;
+    private Long timestamp;
 }
